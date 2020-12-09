@@ -1,0 +1,22 @@
+Package: PsiNorm
+Type: Package
+Title: Normalize sequencing data thanks to Pareto distribution
+Version: 0.1.0
+Authors@R: person("Matteo", "Borella", email = "matteobor94@gmail.com", role = c("aut", "cre"))
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: The function first computes the cell specific shape parameter a of the Pareto distribution and then normalize the samples with it. By maximum likelihood method it estimates the parameter a equal to the log geometric mean of the pseudo-sample.  The Pareto parameter is inversely proportional to the sequencing depth, it is sample specific and its estimate is performed for each cell independently. The normalized counts are equal to log2(ax+1) where x is each cell sample.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    BiocGenerics,
+    MatrixGenerics,
+    S4Vectors,
+    SingleCellExperiment,
+    SummarizedExperiment
+RoxygenNote: 7.1.1
+Suggests: 
+    testthat
+URL: https://github.com/MatteoBlla/PsiNorm
+BugReports: https://github.com/MatteoBlla/PsiNorm/issues
+ 
