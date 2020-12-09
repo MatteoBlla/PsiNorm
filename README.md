@@ -9,13 +9,13 @@
 
 The goal of PsiNorm is to normalize a raw-counting matrix of expression
 genes profiles thanks to the sample specific Pareto shape parameter. The
-function first computes the cell specific shape parameter $\alpha$ of the
+function first computes the cell specific shape parameter α of the
 Pareto distribution and then normalize the samples with it. By maximum
-likelihood method it estimates the parameter $\alpha$ equal to the log
+likelihood method it estimates the parameter α equal to the log
 geometric mean of the pseudo-sample. The Pareto parameter is inversely
 proportional to the sequencing depth, it is sample specific and its
 estimate is performed for each cell independently. The normalized counts
-are equal to log2($\alpha$x+1) where x is each cell sample.
+are equal to log2(αx+1) where x is each cell sample.
 
 ## Installation
 
