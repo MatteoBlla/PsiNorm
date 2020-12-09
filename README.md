@@ -15,7 +15,7 @@ likelihood method it estimates the parameter α equal to the log
 geometric mean of the pseudo-sample. The Pareto parameter is inversely
 proportional to the sequencing depth, it is sample specific and its
 estimate is performed for each cell independently. The normalized counts
-are equal to log2(αx+1) where x is each cell sample.
+are equal to log2(xα+1) where x is each cell sample.
 
 ## Installation
 
