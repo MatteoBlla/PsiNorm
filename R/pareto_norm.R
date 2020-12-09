@@ -41,11 +41,8 @@ pareto_norm <- function(sce) {
   }
   
   else if(class(sce)[1]=="matrix" & BiocGenerics::type(sce)=="double"){
-    tp <- system.time({
       alfa <- pareto.MLE(sce+1)
       m <- log2(t(t(sce)*alfa)+1)
-    })
-    print(paste("Time consuming:", tp, "seconds"))
     return(m)
   }
   

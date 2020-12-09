@@ -1,4 +1,4 @@
 library(testthat)
-library(parsec)
+library(PsiNorm)
 
-test_check("parsec")
+test_check("PsiNorm")
