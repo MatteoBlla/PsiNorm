@@ -1,0 +1,128 @@
+---
+title: "Normalize sequencing data thanks to Pareto distribution"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Installation
+
+First of all we need to install PsiNorm:
+
+```{r, eval = FALSE}
+if(!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("PsiNorm")
+```
+
+```{r}
+suppressPackageStartupMessages(
+  {
+    library(SingleCellExperiment)
+    library(splatter)
+    library(SummarizedExperiment)
+    library(S4Vectors)
+    library(BiocGenerics)
+    library(ggplot2)
+    library(MatrixGenerics)
+    library(scater)
+    library(Rtsne)
+    library(uwot)
+    library(cluster)}
+)
+```
+
+## Introduction
+
+This new normalization method assumes a Pareto distribution of type I to normalize the single-cell RNAseq counting matrix. First It computes the shape parameter for each cellular sample and then use It as size factor to normalize the data. We've shown that it's a good normalization method with less time consumption than other sophisticated methods.
+
+To show how to use PsiNorm I am going to simulate a counting matrix with splatter.
+
+```{r}
+params <- newSplatParams()
+N=500
+set.seed(9999)
+sce <- splatSimulateGroups(params,batchCells=N,
+                           group.prob = rep(0.1,10),
+                           de.prob = 0.2,
+                           verbose = FALSE) 
+```
+
+sce is a SingleCellExperiment object with 500 cellular samples and 10000 genes. I assumed that there is a single batch and ten different cellular groups.
+
+As you can see from the next plot the first two TSNE computed from the raw count matrix can not perfectly discriminate against cellular groups but they get close. 
+
+```{r}
+set.seed(1234)
+sce<-runTSNE(sce, exprs_values="counts", scale=T)
+plotTSNE(sce, colour="Group")
+```
+
+Applying the Pareto normalization to the raw counting matrix and recomputing the TSNE components on it you can obtain better discrimination of the cellular groups.
+
+```{r}
+sce<-PsiNorm::pareto_norm(sce)
+set.seed(1234)
+sce<-runTSNE(sce, exprs_values="Pareto", scale=T)
+plotTSNE(sce, colour="Group")
+```
+
+## Silhouette
+
+One instrument to analitically compare the previous plots is the Silhouette index. Higher is this index better the cellular groups are identified in the reduced dimensionality space. 
+
+```{r}
+set.seed(9999)
+sce<-runTSNE(sce, exprs_values="counts", scale=T)
+dist<-daisy(reducedDim(sce, "TSNE"))
+dist<-as.matrix(dist)
+print(paste("Silhouette from raw counts:", round(summary(
+    silhouette(x=as.numeric(as.factor(sce$Group)),
+               dmatrix = dist))$avg.width, digits = 3)))
+sce<-runTSNE(sce, exprs_values="Pareto", scale=T)
+dist<-daisy(reducedDim(sce, "TSNE"))
+dist<-as.matrix(dist)
+print(paste("Silhouette from Pareto normalized counts:", round(summary(
+    silhouette(x=as.numeric(as.factor(sce$Group)),
+               dmatrix = dist))$avg.width, digits = 3)))
+```
+As you can see the Pareto normalization considerably increse the Silhouette index. 
+
+## Correlation with sequencing depth
+
+Another way we used to evaluate the goodness of the Pareto method is to compute the correlation between the firsts two principal components and the sequencing depth. The assumption is that a good normalization method should decreases this correlation as result of a limitation of the effect of the sequencing depth on data.
+
+```{r}
+set.seed(4444)
+PCA<-reducedDim(runPCA(sce, exprs_values="counts", scale=T), "PCA") 
+PCAp<-reducedDim(runPCA(sce, exprs_values="Pareto", scale=T), "PCA")
+depth<-apply(counts(sce), 2, sum)
+
+print(paste("The Correlation from the raw data is:",
+            round(abs(max(cor(PCA[,1], depth), cor(PCA[,2], depth))), digits=3)))
+print(paste("The Correlation from the Pareto normalized data is:",
+            round(abs(max(cor(PCAp[,1], depth), cor(PCAp[,2], depth))), digits = 3)))
+```
+Here we compared the absolute maximum value of the correlation between the first two principal components and the sequencing depth. As you can see the correlation decreases significantly after the Pareto normalization.
+
+## Session Information
+```{r}
+sessionInfo()
+```
+
+
+
+
+
+
