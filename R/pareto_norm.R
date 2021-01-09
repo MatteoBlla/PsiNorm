@@ -3,7 +3,7 @@
 #' Normalization of a raw counts matrix using the estimate of the shape parameter of the Pareto distribution
 #'
 #' @param sce A SingleCellExperiment object or a counting matrix with genes in rows and cellular samples in columns.
-#'
+#' @import BiocGenerics MatrixGenerics S4Vectors SingleCellExperiment SummarizedExperiment
 #' @return If the input is a SingleCellExperiment object the function return the same object adding in the assays the Pareto normalized count matrix. If the input is a matrix pareto_norm returns a normalized matrix with the same dimensions.
 #' @export
 #'
