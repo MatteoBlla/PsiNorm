@@ -38,35 +38,40 @@ suppressPackageStartupMessages(
     library(MatrixGenerics)
     library(scater)
     library(Rtsne)
-    library(uwot)
     library(cluster)}
 )
 ```
 
 ## Introduction
 
-This new normalization method assumes a Pareto distribution of type I to normalize the single-cell RNAseq counting matrix. First It computes the shape parameter for each cellular sample and then use It as size factor to normalize the data. We've shown that it's a good normalization method with less time consumption than other sophisticated methods.
+This new normalization method assumes a Pareto distribution of type I to normalize the single-cell RNAseq counting matrix. First It computes the shape parameter for each cellular sample and then uses It as size factor to normalize the data. We've shown that it's a good normalization method with less time consumption than other sophisticated methods.
 
-To show how to use PsiNorm I am going to simulate a counting matrix with splatter.
+So I am going to simulate a counting matrix with splatter to show you how works the Pareto normalization method.
 
 ```{r}
+set.seed(1234)
 params <- newSplatParams()
-N=500
-set.seed(9999)
+N=2000
 sce <- splatSimulateGroups(params,batchCells=N,
-                           group.prob = rep(0.1,10),
-                           de.prob = 0.2,
+                           group.prob = rep(0.2,5),
+                           de.prob = 0.1,
                            verbose = FALSE) 
 ```
 
-sce is a SingleCellExperiment object with 500 cellular samples and 10000 genes. I assumed that there is a single batch and ten different cellular groups.
+sce is a SingleCellExperiment object with 2000 cellular samples and 10000 genes. I assumed that there is a single batch and five different cellular groups.
 
 As you can see from the next plot the first two TSNE computed from the raw count matrix can not perfectly discriminate against cellular groups but they get close. 
 
 ```{r}
 set.seed(1234)
 sce<-runTSNE(sce, exprs_values="counts", scale=T)
-plotTSNE(sce, colour="Group")
+df<-data.frame(TSNE1=reducedDim(sce)[,1],
+               TSNE2=reducedDim(sce)[,2],
+               group=sce$Group)
+ggplot(df,aes(TSNE1, TSNE2, color=group))+
+  geom_point()+
+  theme_classic()+
+  theme(legend.title = element_blank())
 ```
 
 Applying the Pareto normalization to the raw counting matrix and recomputing the TSNE components on it you can obtain better discrimination of the cellular groups.
@@ -75,7 +80,13 @@ Applying the Pareto normalization to the raw counting matrix and recomputing the
 sce<-PsiNorm::pareto_norm(sce)
 set.seed(1234)
 sce<-runTSNE(sce, exprs_values="Pareto", scale=T)
-plotTSNE(sce, colour="Group")
+df<-data.frame(TSNE1=reducedDim(sce)[,1],
+               TSNE2=reducedDim(sce)[,2],
+               group=sce$Group)
+ggplot(df,aes(TSNE1, TSNE2, color=group))+
+  geom_point()+
+  theme_classic()+
+  theme(legend.title = element_blank())
 ```
 
 ## Silhouette
@@ -83,7 +94,7 @@ plotTSNE(sce, colour="Group")
 One instrument to analitically compare the previous plots is the Silhouette index. Higher is this index better the cellular groups are identified in the reduced dimensionality space. 
 
 ```{r}
-set.seed(9999)
+set.seed(1234)
 sce<-runTSNE(sce, exprs_values="counts", scale=T)
 dist<-daisy(reducedDim(sce, "TSNE"))
 dist<-as.matrix(dist)
