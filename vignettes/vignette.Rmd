@@ -1,12 +1,15 @@
 ---
 title: "Normalize sequencing data thanks to Pareto distribution"
-output: 
-  rmarkdown::html_vignette:
-    toc: true
+author: 
+-name: Matteo Borella
+affiliation: Department of Biology, University of Padova 
+date: 19 January 2020
 vignette: >
   %\VignetteIndexEntry{vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+output:
+      BiocStyle::html_document  
 ---
 
 ```{r, include=FALSE}
