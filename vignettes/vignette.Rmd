@@ -44,9 +44,16 @@ suppressPackageStartupMessages(
 
 ## Introduction
 
-This new normalization method assumes a Pareto distribution of type I to normalize the single-cell RNAseq counting matrix. First It computes the shape parameter for each cellular sample and then uses It as size factor to normalize the data. We've shown that it's a good normalization method with less time consumption than other sophisticated methods.
+PsiNorm is a new scalable between-normalization for single cell RNA-seq count data based on the power-law Pareto type I  distribution parameter estimate. It can be demonstrated that the Pareto parameter is inversely proportional to the sequencing depth, it is sample specific and its estimate can be obtained for each cell independently. PsiNorm computes the shape parameter for each cellular sample and then uses it as multiplicative size factor to normalize the data. The final goal of the transformation is to align the gene expression distribution especially for those genes characterised by high expression. Note that, similar to other global scaling methods, our method does not remove batch effects, which can be dealt with downstream tools. 
 
-So I am going to simulate a counting matrix with splatter to show you how works the Pareto normalization method.
+To evaluate the ability of PsiNorm to remove technical bias and  reveal the true cell similarity structure, we used both an unsupervised and a supervised approach.
+We first simulate a scRNA-seq experiment with two known clusters using $spaltter$ bioC package.  Then in the unsupervised approach, we i) reduce dimentionality using tSNE, ii) identify clusters using $clara$ partitional method and then we iii)  computed the Adjusted Rand Index (ARI) to compare the known and the estimated partition.
+
+In the supervised approach, we i) reduce dimentionality using tSNE, and we  ii)  computed the silhouette index of the  known partition in the reduced dimensional space. 
+
+## Data Simulation
+
+We simulate a matrix of counts with 2000 cellular samples amd 10000 genes with splatter BioC package:
 
 ```{r}
 set.seed(1234)
@@ -58,10 +65,9 @@ sce <- splatSimulateGroups(params,batchCells=N,
                            verbose = FALSE) 
 ```
 
-sce is a SingleCellExperiment object with 2000 cellular samples and 10000 genes. I assumed that there is a single batch and five different cellular groups.
+sce is a SingleCellExperiment object with a single batch and five different cellular groups.
 
-As you can see from the next plot the first two TSNE computed from the raw count matrix can not perfectly discriminate against cellular groups but they get close. 
-
+To visualize the data we used the first two TSNE dimensions estimated starting from the raw count matrix.  
 ```{r}
 set.seed(1234)
 sce<-runTSNE(sce, exprs_values="counts", scale=T)
@@ -74,10 +80,15 @@ ggplot(df,aes(TSNE1, TSNE2, color=group))+
   theme(legend.title = element_blank())
 ```
 
-Applying the Pareto normalization to the raw counting matrix and recomputing the TSNE components on it you can obtain better discrimination of the cellular groups.
+From the plot it is clear that known groups can not be recognised using raw counts. 
+
+
+## Data Normalization with PsiNorm 
+
+To normalize the raw count we used  PsiNorm normalization (pareto_norm function) and we visualized the data using the first two tSNE components. 
 
 ```{r}
-sce<-PsiNorm::pareto_norm(sce)
+sce<-PsiNorm::pareto_norm(sce) # NON SAREBBE MEGLIO CHIAMARE LA FUNZIONE COME IL NOME DELLA NORMALIZZAIZONE ? PsiNorm ? 
 set.seed(1234)
 sce<-runTSNE(sce, exprs_values="Pareto", scale=T)
 df<-data.frame(TSNE1=reducedDim(sce)[,1],
@@ -89,9 +100,19 @@ ggplot(df,aes(TSNE1, TSNE2, color=group))+
   theme(legend.title = element_blank())
 ```
 
-## Silhouette
+We can appreciate from the plot that  PsiNorm allows a  better separation among known cellular groups.
 
-One instrument to analitically compare the previous plots is the Silhouette index. Higher is this index better the cellular groups are identified in the reduced dimensionality space. 
+
+## Unsupervised approach: ARI index 
+
+We calculate ARI index of both raw counts and PsiNorm normalized counts after tSNE dimension reduction and $clara$ clustering (with $k$ equal to the simulated number of clusters); higher the Silhouette, better the normalization. 
+
+DA FARE 
+
+
+## Supervised approach: Silhouette index
+
+We calculate Silhouette index of both raw counts and PsiNorm normalized counts after tSNE dimension reduction exploiting known simulated clusters; higher the Silhouette, better the normalization. 
 
 ```{r}
 set.seed(1234)
@@ -108,11 +129,12 @@ print(paste("Silhouette from Pareto normalized counts:", round(summary(
     silhouette(x=as.numeric(as.factor(sce$Group)),
                dmatrix = dist))$avg.width, digits = 3)))
 ```
-As you can see the Pareto normalization considerably increse the Silhouette index. 
+Pareto normalization considerably increses the Silhouette index. 
 
-## Correlation with sequencing depth
 
-Another way we used to evaluate the goodness of the Pareto method is to compute the correlation between the firsts two principal components and the sequencing depth. The assumption is that a good normalization method should decreases this correlation as result of a limitation of the effect of the sequencing depth on data.
+## Correlation of PC1 and PC2 with sequencing depth
+
+To check if PsiNorm is able to capture technical noise and remove unwanted variation within a dataset (due for instance to differences in sequencing depth), we check whether the first two PCs are capturing technical variance. We computed the maximum correlation obtained between PC1 and PC2 and cell sequencing depths; a higher correlation indicates that the normalization was not able to properly remove noise.
 
 ```{r}
 set.seed(4444)
@@ -125,7 +147,7 @@ print(paste("The Correlation from the raw data is:",
 print(paste("The Correlation from the Pareto normalized data is:",
             round(abs(max(cor(PCAp[,1], depth), cor(PCAp[,2], depth))), digits = 3)))
 ```
-Here we compared the absolute maximum value of the correlation between the first two principal components and the sequencing depth. As you can see the correlation decreases significantly after the Pareto normalization.
+Our results demonstrate that the correlation significantly decreases  after the PsiNorm normalization.
 
 ## Session Information
 ```{r}
