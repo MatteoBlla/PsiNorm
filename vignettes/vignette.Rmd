@@ -26,7 +26,7 @@ First of all we need to install PsiNorm:
 ```{r, eval = FALSE}
 if(!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install("PsiNorm")
+BiocManager::install("MatteoBlla/PsiNorm")
 ```
 
 ```{r}
@@ -91,9 +91,10 @@ From the plot it is clear that known groups can not be recognised using raw coun
 To normalize the raw count we used  PsiNorm normalization (pareto_norm function) and we visualized the data using the first two tSNE components. 
 
 ```{r}
-sce<-PsiNorm::pareto_norm(sce) # NON SAREBBE MEGLIO CHIAMARE LA FUNZIONE COME IL NOME DELLA NORMALIZZAIZONE ? PsiNorm ? 
+sce<-PsiNorm(sce)
+sce<-logNormCounts(sce)
 set.seed(1234)
-sce<-runTSNE(sce, exprs_values="Pareto", scale=T)
+sce<-runTSNE(sce, exprs_values="logcounts", scale=T)
 df<-data.frame(TSNE1=reducedDim(sce)[,1],
                TSNE2=reducedDim(sce)[,2],
                group=sce$Group)
@@ -103,14 +104,7 @@ ggplot(df,aes(TSNE1, TSNE2, color=group))+
   theme(legend.title = element_blank())
 ```
 
-We can appreciate from the plot that  PsiNorm allows a  better separation among known cellular groups.
-
-
-## Unsupervised approach: ARI index 
-
-We calculate ARI index of both raw counts and PsiNorm normalized counts after tSNE dimension reduction and $clara$ clustering (with $k$ equal to the simulated number of clusters); higher the Silhouette, better the normalization. 
-
-DA FARE 
+We can appreciate from the plot that PsiNorm allows a  better separation among known cellular groups.
 
 
 ## Supervised approach: Silhouette index
@@ -125,7 +119,7 @@ dist<-as.matrix(dist)
 print(paste("Silhouette from raw counts:", round(summary(
     silhouette(x=as.numeric(as.factor(sce$Group)),
                dmatrix = dist))$avg.width, digits = 3)))
-sce<-runTSNE(sce, exprs_values="Pareto", scale=T)
+sce<-runTSNE(sce, exprs_values="logcounts", scale=T)
 dist<-daisy(reducedDim(sce, "TSNE"))
 dist<-as.matrix(dist)
 print(paste("Silhouette from Pareto normalized counts:", round(summary(
@@ -142,7 +136,7 @@ To check if PsiNorm is able to capture technical noise and remove unwanted varia
 ```{r}
 set.seed(4444)
 PCA<-reducedDim(runPCA(sce, exprs_values="counts", scale=T), "PCA") 
-PCAp<-reducedDim(runPCA(sce, exprs_values="Pareto", scale=T), "PCA")
+PCAp<-reducedDim(runPCA(sce, exprs_values="logcounts", scale=T), "PCA")
 depth<-apply(counts(sce), 2, sum)
 
 print(paste("The Correlation from the raw data is:",
