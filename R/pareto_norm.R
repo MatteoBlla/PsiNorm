@@ -11,6 +11,7 @@
 #'   which to save the normalized data (default to "PsiNorm").
 #' @importFrom MatrixGenerics colMins colSums2
 #' @import SummarizedExperiment
+#' @importFrom methods setMethod
 #' 
 #' @return If the input is a SingleCellExperiment object the function returns
 #'   the same object adding as sizeFactors those computed by PsiNorm. If the
