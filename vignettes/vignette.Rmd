@@ -3,7 +3,7 @@ title: "Normalize sequencing data thanks to Pareto distribution"
 author: 
 -name: Matteo Borella
 affiliation: Department of Biology, University of Padova 
-date: 19 January 2020
+date: "Last modified: January 23, 2021; Compiled: `r format(Sys.time(), '%B %d, %Y')`"
 vignette: >
   %\VignetteIndexEntry{vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,12 +12,18 @@ output:
       BiocStyle::html_document  
 ---
 
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{mbkmeans vignette}
+-->
+
 ```{r, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
+
 
 ## Installation
 
