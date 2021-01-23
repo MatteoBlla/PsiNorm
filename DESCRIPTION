@@ -25,7 +25,14 @@ Imports:
     SummarizedExperiment
 RoxygenNote: 7.1.1
 Suggests: 
-    testthat
+    testthat,
+    BiocStyle,
+    knitr,
+    splatter,
+    scater,
+    ggplot2,
+    Rtsne,
+    cluster
 URL: https://github.com/MatteoBlla/PsiNorm
 BugReports: https://github.com/MatteoBlla/PsiNorm/issues
 VignetteBuilder: knitr

@@ -41,13 +41,11 @@ suppressPackageStartupMessages(
     library(SingleCellExperiment)
     library(splatter)
     library(SummarizedExperiment)
-    library(S4Vectors)
-    library(BiocGenerics)
     library(ggplot2)
-    library(MatrixGenerics)
     library(scater)
     library(Rtsne)
-    library(cluster)}
+    library(cluster)
+    library(PsiNorm)}
 )
 ```
 
