@@ -1,22 +1,39 @@
 Package: PsiNorm
 Type: Package
-Title: Normalize sequencing data thanks to Pareto distribution
-Version: 0.99.0
-Authors@R: person("Matteo", "Borella", email = "matteobor94@gmail.com", role = c("aut", "cre"))
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: The function first computes the cell specific shape parameter α of the Pareto distribution and then normalize the samples with it. 
+Title: Scaling normalization based on the Pareto distribution
+Authors@R: 
+    c(person("Matteo", "Borella", 
+           email = "matteobor94@gmail.com", 
+           role = c("aut", "cre", "cph")),
+      person("Davide", "Risso", role = c("aut"),
+             email = "risso.davide@gmail.com"),
+      person("Chiara", "Romualdi", role = c("aut"),
+             email = "chiara.romualdi@gmail.com"))
+Description: 
+ Normalizes RNA-seq data using a sample-specific Pareto distribution's 
+ shape parameter.
+Version: 0.99.1
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 4.0),
+    methods
 Imports:
-    BiocGenerics,
     MatrixGenerics,
-    S4Vectors,
     SingleCellExperiment,
     SummarizedExperiment
 RoxygenNote: 7.1.1
 Suggests: 
-    testthat
+    testthat,
+    BiocStyle,
+    knitr,
+    splatter,
+    scater,
+    ggplot2,
+    Rtsne,
+    cluster
 URL: https://github.com/MatteoBlla/PsiNorm
 BugReports: https://github.com/MatteoBlla/PsiNorm/issues
+VignetteBuilder: knitr
  
