@@ -41,7 +41,8 @@ suppressPackageStartupMessages(
     library(MatrixGenerics)
     library(scater)
     library(Rtsne)
-    library(cluster)}
+    library(cluster)
+    library(scuttle)}
 )
 ```
 
@@ -89,8 +90,9 @@ To normalize the raw count we used  PsiNorm normalization (pareto_norm function)
 
 ```{r}
 sce<-PsiNorm::PsiNorm(sce, whichAssay="counts") 
-assay(sce, "PsiNorm")<-log2(t(t(counts(sce))/sizeFactors(sce))+1)
-
+#assay(sce, "PsiNorm")<-log2(t(t(counts(sce))/sizeFactors(sce))+1)
+assay(sce, "PsiNorm")<-logcounts(logNormCounts(sce,
+                                     center.size.factors=F))
 set.seed(1234)
 sce<-runPCA(sce, exprs_values="PsiNorm", scale=T)
 df<-data.frame(PC1=reducedDim(sce)[,1],
