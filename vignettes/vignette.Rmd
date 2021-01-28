@@ -90,7 +90,6 @@ To normalize the raw count we used  PsiNorm normalization (pareto_norm function)
 
 ```{r}
 sce<-PsiNorm::PsiNorm(sce, whichAssay="counts") 
-#assay(sce, "PsiNorm")<-log2(t(t(counts(sce))/sizeFactors(sce))+1)
 assay(sce, "PsiNorm")<-logcounts(logNormCounts(sce,
                                      center.size.factors=F))
 set.seed(1234)
