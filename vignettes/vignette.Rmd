@@ -5,8 +5,6 @@ author:
     affiliation: Department of Biology and Department of Statistical Sciences, University of Padova 
 date: "Last modified: April 7, 2021; Compiled: `r format(Sys.time(), '%B %d, %Y')`"
 vignette: >
-  %\VignetteIndexEntry{PsiNorm vignette}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 output:
       BiocStyle::html_document  
@@ -77,7 +75,7 @@ sce is a SingleCellExperiment object with a single batch and five different cell
 To visualize the data we used the first two TSNE dimensions estimated starting from the raw count matrix.  
 ```{r}
 set.seed(1234)
-sce<-runTSNE(sce, exprs_values="counts", scale=T)
+sce<-runTSNE(sce, exprs_values="counts", scale=TRUE)
 df<-data.frame(TSNE1=reducedDim(sce)[,1],
                TSNE2=reducedDim(sce)[,2],
                group=sce$Group)
@@ -106,7 +104,7 @@ The `logNormCounts` function can be then used to normalize the data by multiplyi
 
 ```{r}
 set.seed(1234)
-sce<-runTSNE(sce, exprs_values="logcounts", scale=T)
+sce<-runTSNE(sce, exprs_values="logcounts", scale=TRUE)
 df<-data.frame(TSNE1=reducedDim(sce)[,1],
                TSNE2=reducedDim(sce)[,2],
                group=sce$Group)
@@ -146,8 +144,8 @@ To check if PsiNorm is able to capture technical noise and remove unwanted varia
 
 ```{r}
 set.seed(4444)
-PCA<-reducedDim(runPCA(sce, exprs_values="counts", scale=T), "PCA") 
-PCAp<-reducedDim(runPCA(sce, exprs_values="logcounts", scale=T), "PCA")
+PCA<-reducedDim(runPCA(sce, exprs_values="counts", scale=TRUE), "PCA") 
+PCAp<-reducedDim(runPCA(sce, exprs_values="logcounts", scale=TRUE), "PCA")
 depth<-apply(counts(sce), 2, sum)
 
 print(paste("The Correlation from the raw data is:",
