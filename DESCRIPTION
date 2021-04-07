@@ -12,7 +12,7 @@ Authors@R:
 Description: 
  Normalizes RNA-seq data using a sample-specific Pareto distribution's 
  shape parameter.
-Version: 0.99.1
+Version: 0.99.2
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

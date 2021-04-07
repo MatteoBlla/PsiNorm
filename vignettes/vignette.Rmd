@@ -1,11 +1,11 @@
 ---
 title: "Normalize sequencing data thanks to Pareto distribution"
 author: 
--name: Matteo Borella
-affiliation: Department of Biology, University of Padova 
-date: "Last modified: January 23, 2021; Compiled: `r format(Sys.time(), '%B %d, %Y')`"
+    name: Matteo Borella and Davide Risso
+    affiliation: Department of Biology and Department of Statistical Sciences, University of Padova 
+date: "Last modified: April 7, 2021; Compiled: `r format(Sys.time(), '%B %d, %Y')`"
 vignette: >
-  %\VignetteIndexEntry{vignette}
+  %\VignetteIndexEntry{PsiNorm vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 output:
@@ -14,7 +14,7 @@ output:
 
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{mbkmeans vignette}
+%\VignetteIndexEntry{PsiNorm vignette}
 -->
 
 ```{r, include=FALSE}
@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 ```
 
 
-## Installation
+# Installation
 
 First of all we need to install PsiNorm:
 
@@ -49,16 +49,16 @@ suppressPackageStartupMessages(
 )
 ```
 
-## Introduction
+# Introduction
 
-PsiNorm is a new scalable between-normalization for single cell RNA-seq count data based on the power-law Pareto type I  distribution parameter estimate. It can be demonstrated that the Pareto parameter is inversely proportional to the sequencing depth, it is sample specific and its estimate can be obtained for each cell independently. PsiNorm computes the shape parameter for each cellular sample and then uses it as multiplicative size factor to normalize the data. The final goal of the transformation is to align the gene expression distribution especially for those genes characterised by high expression. Note that, similar to other global scaling methods, our method does not remove batch effects, which can be dealt with downstream tools. 
+PsiNorm is a new scalable between-sample normalization for single cell RNA-seq count data based on the power-law Pareto type I distribution. It can be demonstrated that the Pareto parameter is inversely proportional to the sequencing depth, it is sample specific and its estimate can be obtained for each cell independently. PsiNorm computes the shape parameter for each cellular sample and then uses it as multiplicative size factor to normalize the data. The final goal of the transformation is to align the gene expression distribution especially for those genes characterised by high expression. Note that, similar to other global scaling methods, our method does not remove batch effects, which can be dealt with downstream tools. 
 
 To evaluate the ability of PsiNorm to remove technical bias and  reveal the true cell similarity structure, we used both an unsupervised and a supervised approach.
 We first simulate a scRNA-seq experiment with two known clusters using $spaltter$ bioC package.  Then in the unsupervised approach, we i) reduce dimentionality using tSNE, ii) identify clusters using $clara$ partitional method and then we iii)  computed the Adjusted Rand Index (ARI) to compare the known and the estimated partition.
 
-In the supervised approach, we i) reduce dimentionality using tSNE, and we  ii)  computed the silhouette index of the  known partition in the reduced dimensional space. 
+In the supervised approach, we i) reduce dimentionality using tSNE, and we  ii)  compute the silhouette index of the  known partition in the reduced dimensional space. 
 
-## Data Simulation
+# Data Simulation
 
 We simulate a matrix of counts with 2000 cellular samples amd 10000 genes with splatter BioC package:
 
@@ -90,13 +90,21 @@ ggplot(df,aes(TSNE1, TSNE2, color=group))+
 From the plot it is clear that known groups can not be recognised using raw counts. 
 
 
-## Data Normalization with PsiNorm 
+# Data Normalization with PsiNorm 
 
-To normalize the raw count we used  PsiNorm normalization (pareto_norm function) and we visualized the data using the first two tSNE components. 
+To normalize the raw count we used the PsiNorm normalization and we visualized the data using the first two tSNE components. 
 
 ```{r}
 sce<-PsiNorm(sce)
 sce<-logNormCounts(sce)
+head(sizeFactors(sce))
+```
+
+Note that running the `PsiNorm` function computes a set of size factors that are added to the SingleCellExperiment object.
+
+The `logNormCounts` function can be then used to normalize the data by multiplying the raw counts and the size factors.
+
+```{r}
 set.seed(1234)
 sce<-runTSNE(sce, exprs_values="logcounts", scale=T)
 df<-data.frame(TSNE1=reducedDim(sce)[,1],
@@ -108,32 +116,31 @@ ggplot(df,aes(TSNE1, TSNE2, color=group))+
   theme(legend.title = element_blank())
 ```
 
-We can appreciate from the plot that PsiNorm allows a  better separation among known cellular groups.
+We can appreciate from the plot that PsiNorm allows a better separation among known cellular groups.
 
 
-## Supervised approach: Silhouette index
+# Supervised approach: Silhouette index
 
-We calculate Silhouette index of both raw counts and PsiNorm normalized counts after tSNE dimension reduction exploiting known simulated clusters; higher the Silhouette, better the normalization. 
+We calculate the Silhouette index of both raw counts and PsiNorm normalized counts after tSNE dimension reduction exploiting known simulated clusters; higher the Silhouette, better the normalization. 
 
 ```{r}
 set.seed(1234)
-sce<-runTSNE(sce, exprs_values="counts", scale=T)
+sce<-runTSNE(sce, exprs_values="counts", scale=TRUE)
 dist<-daisy(reducedDim(sce, "TSNE"))
 dist<-as.matrix(dist)
 print(paste("Silhouette from raw counts:", round(summary(
     silhouette(x=as.numeric(as.factor(sce$Group)),
                dmatrix = dist))$avg.width, digits = 3)))
-sce<-runTSNE(sce, exprs_values="logcounts", scale=T)
+sce<-runTSNE(sce, exprs_values="logcounts", scale=TRUE)
 dist<-daisy(reducedDim(sce, "TSNE"))
 dist<-as.matrix(dist)
 print(paste("Silhouette from Pareto normalized counts:", round(summary(
     silhouette(x=as.numeric(as.factor(sce$Group)),
                dmatrix = dist))$avg.width, digits = 3)))
 ```
-Pareto normalization considerably increses the Silhouette index. 
+Pareto normalization considerably increases the Silhouette index. 
 
-
-## Correlation of PC1 and PC2 with sequencing depth
+# Correlation of PC1 and PC2 with sequencing depth
 
 To check if PsiNorm is able to capture technical noise and remove unwanted variation within a dataset (due for instance to differences in sequencing depth), we check whether the first two PCs are capturing technical variance. We computed the maximum correlation obtained between PC1 and PC2 and cell sequencing depths; a higher correlation indicates that the normalization was not able to properly remove noise.
 
@@ -150,7 +157,8 @@ print(paste("The Correlation from the Pareto normalized data is:",
 ```
 Our results demonstrate that the correlation significantly decreases  after the PsiNorm normalization.
 
-## Session Information
+# Session Information
+
 ```{r}
 sessionInfo()
 ```
