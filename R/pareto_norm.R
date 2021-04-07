@@ -43,7 +43,7 @@ setMethod(
 setMethod(
   f = "PsiNorm",
   signature = signature(x = "SingleCellExperiment"),
-  definition = function(x, whichAssay = 1){
+  definition = function(x, whichAssay = "counts"){
     sf <- computePsiNormSF(assay(x, whichAssay))
     sizeFactors(x) <- sf
     return(x)

@@ -11,7 +11,7 @@ PsiNorm(x, ...)
 
 \S4method{PsiNorm}{SummarizedExperiment}(x, whichAssay = 1, assayName = "PsiNorm")
 
-\S4method{PsiNorm}{SingleCellExperiment}(x, whichAssay = 1)
+\S4method{PsiNorm}{SingleCellExperiment}(x, whichAssay = "counts")
 
 \S4method{PsiNorm}{ANY}(x)
 }

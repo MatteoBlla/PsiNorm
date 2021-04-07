@@ -9,7 +9,7 @@ test_that("PSiNorm works with all input classes", {
   out_se <- PsiNorm(se)
   expect_equal(out1, assay(out_se, "PsiNorm"))
   
-  out_sce <- PsiNorm(sce)
+  out_sce <- PsiNorm(sce, whichAssay = 1)
   out2 <- t(t(m)/sizeFactors(out_sce))
   expect_equal(out1, out2)
 })
