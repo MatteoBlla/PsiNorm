@@ -10,9 +10,9 @@ Authors@R:
       person("Chiara", "Romualdi", role = c("aut"),
              email = "chiara.romualdi@gmail.com"))
 Description: 
- Normalizes RNA-seq data using a sample-specific Pareto distribution's 
- shape parameter.
-Version: 0.99.1
+ Normalizes RNA-seq data using an extremely scalable gloabal scaling approach
+ based on the shape parameter of a sample-specific Pareto distribution.
+Version: 0.99.3
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -32,8 +32,17 @@ Suggests:
     scater,
     ggplot2,
     Rtsne,
-    cluster
+    cluster,
+    kableExtra,
+    mclust
 URL: https://github.com/MatteoBlla/PsiNorm
 BugReports: https://github.com/MatteoBlla/PsiNorm/issues
 VignetteBuilder: knitr
- 
+biocViews:
+  Normalization,
+  GeneExpression,
+  RNASeq,
+  Software,
+  Transcriptomics,
+  Sequencing,
+  SingleCell
