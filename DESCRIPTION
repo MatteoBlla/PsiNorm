@@ -33,7 +33,8 @@ Suggests:
     ggplot2,
     Rtsne,
     cluster,
-    kableExtra
+    kableExtra,
+    mclust
 URL: https://github.com/MatteoBlla/PsiNorm
 BugReports: https://github.com/MatteoBlla/PsiNorm/issues
 VignetteBuilder: knitr
