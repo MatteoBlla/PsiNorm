@@ -32,23 +32,12 @@ if(!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("PsiNorm")
 ```
 
-```{r}
-suppressPackageStartupMessages(
-  {
-    library(SingleCellExperiment)
-    library(splatter)
-    library(SummarizedExperiment)
-    library(S4Vectors)
-    library(BiocGenerics)
-    library(ggplot2)
-    library(MatrixGenerics)
-    library(scater)
-    library(Rtsne)
-    library(cluster)
-    library(scuttle)
-    library(PsiNorm)
-  }
-)
+```{r, message=FALSE, warning=FALSE}
+library(SingleCellExperiment)
+library(splatter)
+library(scater)
+library(cluster)
+library(PsiNorm)
 ```
 
 # Introduction
