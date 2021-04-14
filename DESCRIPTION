@@ -24,7 +24,8 @@ Imports:
     SingleCellExperiment,
     SummarizedExperiment
 RoxygenNote: 7.1.1
-Suggests: 
+Suggests:
+    rmarkdown,
     testthat,
     BiocStyle,
     knitr,
