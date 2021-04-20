@@ -12,7 +12,7 @@ Authors@R:
 Description: 
  Normalizes RNA-seq data using an extremely scalable gloabal scaling approach
  based on the shape parameter of a sample-specific Pareto distribution.
-Version: 0.99.3
+Version: 0.99.4
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
